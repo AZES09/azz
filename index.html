@@ -69,6 +69,16 @@
             <input type="color" id="fill-color" value="#000000">
         </div>
         <div class="control-group">
+            <label for="canvas-width">Canvas Width:</label>
+            <input type="range" id="canvas-width" min="800" max="3840" value="1920">
+            <span id="canvas-width-value">1920</span>
+        </div>
+        <div class="control-group">
+            <label for="canvas-height">Canvas Height:</label>
+            <input type="range" id="canvas-height" min="600" max="2160" value="1080">
+            <span id="canvas-height-value">1080</span>
+        </div>
+        <div class="control-group">
             <button id="zoom-in">Zoom In</button>
             <button id="zoom-out">Zoom Out</button>
         </div>
@@ -108,6 +118,8 @@
         let yOffset = 0; // Initial y translation
         let running = true;
         let paused = false;
+        let canvasWidth = 1920;
+        let canvasHeight = 1080;
 
         function hypot([re, im]) {
             return Math.hypot(re, im);
@@ -126,7 +138,7 @@
         }
 
         function setup() {
-            createCanvas(1920, 1080);
+            createCanvas(canvasWidth, canvasHeight);
             loadSVG(document.getElementById('svg-url').value);
 
             document.getElementById('load-svg').addEventListener('click', async () => {
@@ -179,6 +191,18 @@
                 R = [];
                 running = true;
                 paused = false;
+            });
+
+            document.getElementById('canvas-width').addEventListener('input', (event) => {
+                canvasWidth = parseInt(event.target.value);
+                document.getElementById('canvas-width-value').textContent = canvasWidth;
+                resizeCanvas(canvasWidth, canvasHeight);
+            });
+
+            document.getElementById('canvas-height').addEventListener('input', (event) => {
+                canvasHeight = parseInt(event.target.value);
+                document.getElementById('canvas-height-value').textContent = canvasHeight;
+                resizeCanvas(canvasWidth, canvasHeight);
             });
         }
 
