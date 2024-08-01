@@ -239,6 +239,7 @@
                 pop();
 
                 // Draw circles and legs
+                push();
                 translate(width / 2 + xOffset, height / 2 + yOffset);
                 scale(zoomRate);
 
@@ -261,11 +262,11 @@
                     line(...prevP, ...cpoint);
                 }
 
-                // Draw the connecting line from circles to path
-                push();
-                translate(-width / 4, 0); // Adjust translation to connect properly
+                // Draw the connecting line from the last circle to the path
                 stroke(document.getElementById('line-color').value);
-                line(cpoint[0] + width / 4, cpoint[1], R[0][0] + width / 4 + xOffset, R[0][1]);
+                strokeWeight(parseInt(document.getElementById('stroke-slider').value)); // Apply stroke weight
+                line(cpoint[0] + width / 2, cpoint[1], R[R.length - 1][0] + width / 4, R[R.length - 1][1]);
+
                 pop();
 
                 t += parseInt(document.getElementById('speed-slider').value);
