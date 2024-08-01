@@ -79,6 +79,11 @@
             <span id="canvas-height-value">1080</span>
         </div>
         <div class="control-group">
+            <label for="animation-scale">Animation Scale:</label>
+            <input type="range" id="animation-scale" min="0.1" max="5" step="0.1" value="1">
+            <span id="animation-scale-value">1</span>
+        </div>
+        <div class="control-group">
             <button id="zoom-in">Zoom In</button>
             <button id="zoom-out">Zoom Out</button>
         </div>
@@ -120,6 +125,7 @@
         let paused = false;
         let canvasWidth = 1920;
         let canvasHeight = 1080;
+        let animationScale = 1; // Initial animation scale factor
 
         function hypot([re, im]) {
             return Math.hypot(re, im);
@@ -204,6 +210,11 @@
                 document.getElementById('canvas-height-value').textContent = canvasHeight;
                 resizeCanvas(canvasWidth, canvasHeight);
             });
+
+            document.getElementById('animation-scale').addEventListener('input', (event) => {
+                animationScale = parseFloat(event.target.value);
+                document.getElementById('animation-scale-value').textContent = animationScale;
+            });
         }
 
         async function loadSVG(url) {
@@ -257,7 +268,7 @@
                 beginShape();
                 if (R.length < N_of_out) R.push(cpoint);
                 for (let i = 1, n = R.length; i < n; ++i) {
-                    vertex(...R[i]);
+                    vertex(...R[i].map(v => v * animationScale)); // Scale path points
                 }
                 endShape();
                 pop();
@@ -273,7 +284,7 @@
                 strokeWeight(1); // Default stroke weight for circles
                 let circleStart = [0, 0];
                 for (let i = 0; i < N_of_circles; ++i) {
-                    const r = hypot(DFT[i]);
+                    const r = hypot(DFT[i]) * animationScale; // Scale radius
                     ellipse(circleStart[0], circleStart[1], r * 2);
                     circleStart = add(circleStart, mul(DFT[i], expim(a * K[i])));
                 }
@@ -291,7 +302,7 @@
                 // Draw the connecting line from the last circle to the path
                 stroke(document.getElementById('line-color').value);
                 strokeWeight(parseInt(document.getElementById('stroke-slider').value)); // Apply stroke weight
-                line(prevPoint[0] + width / 4, prevPoint[1], R[R.length - 1][0] + width / 4, R[R.length - 1][1]);
+                line(prevPoint[0] + width / 4, prevPoint[1], R[R.length - 1][0] * animationScale + width / 4, R[R.length - 1][1] * animationScale);
 
                 pop();
 
