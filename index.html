@@ -247,25 +247,27 @@
                 noFill();
                 stroke(document.getElementById('circle-color').value);
                 strokeWeight(1); // Default stroke weight for circles
-                for (let i = 0, cpoint = [0, 0]; i < N_of_circles; ++i) {
+                let circleStart = [0, 0];
+                for (let i = 0; i < N_of_circles; ++i) {
                     const r = hypot(DFT[i]);
-                    ellipse(cpoint[0], cpoint[1], r * 2);
-                    cpoint = add(cpoint, mul(DFT[i], expim(a * K[i])));
+                    ellipse(circleStart[0], circleStart[1], r * 2);
+                    circleStart = add(circleStart, mul(DFT[i], expim(a * K[i])));
                 }
 
                 // Draw legs (lines connecting circles)
                 stroke(document.getElementById('leg-color').value);
                 strokeWeight(1); // Default stroke weight for legs
-                for (let i = 0, cpoint = [0, 0]; i < N_of_circles; ++i) {
-                    let prevP = cpoint;
-                    cpoint = add(cpoint, mul(DFT[i], expim(a * K[i])));
-                    line(...prevP, ...cpoint);
+                let prevPoint = [0, 0];
+                for (let i = 0; i < N_of_circles; ++i) {
+                    let currentPoint = add(prevPoint, mul(DFT[i], expim(a * K[i])));
+                    line(prevPoint[0], prevPoint[1], currentPoint[0], currentPoint[1]);
+                    prevPoint = currentPoint;
                 }
 
                 // Draw the connecting line from the last circle to the path
                 stroke(document.getElementById('line-color').value);
                 strokeWeight(parseInt(document.getElementById('stroke-slider').value)); // Apply stroke weight
-                line(cpoint[0] + width / 2, cpoint[1], R[R.length - 1][0] + width / 4, R[R.length - 1][1]);
+                line(prevPoint[0] + width / 4, prevPoint[1], R[R.length - 1][0] + width / 4, R[R.length - 1][1]);
 
                 pop();
 
