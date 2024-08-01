@@ -223,9 +223,24 @@
                     cpoint = add(cpoint, mul(DFT[i], expim(a * K[i])));
                 }
 
+                // Draw path with adjustable stroke weight
+                push();
+                translate(width / 4 + xOffset, height / 2 + yOffset);
+                scale(zoomRate);
+                stroke(document.getElementById('line-color').value);
+                strokeWeight(parseInt(document.getElementById('stroke-slider').value)); // Apply stroke weight
+                noFill();
+                beginShape();
+                if (R.length < N_of_out) R.push(cpoint);
+                for (let i = 1, n = R.length; i < n; ++i) {
+                    vertex(...R[i]);
+                }
+                endShape();
+                pop();
+
+                // Draw circles and legs
                 translate(width / 2 + xOffset, height / 2 + yOffset);
                 scale(zoomRate);
-                if (follow) translate(-cpoint[0], -cpoint[1]);
 
                 // Draw circles
                 noFill();
@@ -246,16 +261,6 @@
                     line(...prevP, ...cpoint);
                 }
 
-                // Draw path with adjustable stroke weight
-                stroke(document.getElementById('line-color').value);
-                strokeWeight(parseInt(document.getElementById('stroke-slider').value)); // Apply stroke weight
-                noFill();
-                beginShape();
-                if (R.length < N_of_out) R.push(cpoint);
-                for (let i = 1, n = R.length; i < n; ++i) {
-                    vertex(...R[i]);
-                }
-                endShape();
                 t += parseInt(document.getElementById('speed-slider').value);
             }
         }
