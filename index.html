@@ -246,11 +246,9 @@
                 noFill();
                 stroke(document.getElementById('circle-color').value);
                 strokeWeight(1); // Default stroke weight for circles
-                let lastPoint = [0, 0];
                 for (let i = 0, cpoint = [0, 0]; i < N_of_circles; ++i) {
                     const r = hypot(DFT[i]);
                     ellipse(cpoint[0], cpoint[1], r * 2);
-                    lastPoint = cpoint;
                     cpoint = add(cpoint, mul(DFT[i], expim(a * K[i])));
                 }
 
@@ -263,10 +261,12 @@
                     line(...prevP, ...cpoint);
                 }
 
-                // Draw line connecting the circles to the path
-                stroke(255); // White line
-                line(lastPoint[0] + width / 2 + xOffset, lastPoint[1] + height / 2 + yOffset,
-                    R[R.length - 1][0] + width / 4 + xOffset, R[R.length - 1][1] + height / 2 + yOffset);
+                // Draw the connecting line from circles to path
+                push();
+                translate(-width / 4, 0); // Adjust translation to connect properly
+                stroke(document.getElementById('line-color').value);
+                line(cpoint[0] + width / 4, cpoint[1], R[0][0] + width / 4 + xOffset, R[0][1]);
+                pop();
 
                 t += parseInt(document.getElementById('speed-slider').value);
             }
