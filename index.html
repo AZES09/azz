@@ -225,7 +225,7 @@
 
                 // Draw path with adjustable stroke weight
                 push();
-                translate(width / 4 + xOffset, height / 2 + yOffset);
+                translate(width / 2 + xOffset, height / 2 + yOffset);
                 scale(zoomRate);
                 stroke(document.getElementById('line-color').value);
                 strokeWeight(parseInt(document.getElementById('stroke-slider').value)); // Apply stroke weight
@@ -265,10 +265,8 @@
 
                 // Draw the connecting line from circles to path
                 push();
-                translate(width / 4 + xOffset, height / 2 + yOffset);
-                scale(zoomRate);
                 stroke(document.getElementById('line-color').value);
-                line(prevP[0] + width / 4, prevP[1], R[R.length - 1][0] + width / 4 + xOffset, R[R.length - 1][1] + height / 2 + yOffset);
+                line(prevP[0], prevP[1], R[R.length - 1][0] + width / 2 + xOffset, R[R.length - 1][1] + height / 2 + yOffset);
                 pop();
 
                 t += parseInt(document.getElementById('speed-slider').value);
