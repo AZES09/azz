@@ -34,7 +34,7 @@
 <body>
     <div id="controls">
         <div class="control-group">
-            <input type="text" id="svg-url" value="lamborghini.svg" placeholder="Enter SVG URL">
+            <input type="text" id="svg-url" value="images.svg" placeholder="Enter SVG URL">
             <button id="load-svg">Load SVG</button>
         </div>
         <div class="control-group">
@@ -67,21 +67,6 @@
         <div class="control-group">
             <label for="fill-color">Background Color:</label>
             <input type="color" id="fill-color" value="#000000">
-        </div>
-        <div class="control-group">
-            <label for="canvas-width">Canvas Width:</label>
-            <input type="range" id="canvas-width" min="800" max="3840" value="1920">
-            <span id="canvas-width-value">1920</span>
-        </div>
-        <div class="control-group">
-            <label for="canvas-height">Canvas Height:</label>
-            <input type="range" id="canvas-height" min="600" max="2160" value="1080">
-            <span id="canvas-height-value">1080</span>
-        </div>
-        <div class="control-group">
-            <label for="animation-scale">Animation Scale:</label>
-            <input type="range" id="animation-scale" min="0.1" max="5" step="0.1" value="1">
-            <span id="animation-scale-value">1</span>
         </div>
         <div class="control-group">
             <button id="zoom-in">Zoom In</button>
@@ -123,9 +108,6 @@
         let yOffset = 0; // Initial y translation
         let running = true;
         let paused = false;
-        let canvasWidth = 1920;
-        let canvasHeight = 1080;
-        let animationScale = 1; // Initial animation scale factor
 
         function hypot([re, im]) {
             return Math.hypot(re, im);
@@ -144,7 +126,7 @@
         }
 
         function setup() {
-            createCanvas(canvasWidth, canvasHeight);
+            createCanvas(1920, 1080);
             loadSVG(document.getElementById('svg-url').value);
 
             document.getElementById('load-svg').addEventListener('click', async () => {
@@ -197,23 +179,6 @@
                 R = [];
                 running = true;
                 paused = false;
-            });
-
-            document.getElementById('canvas-width').addEventListener('input', (event) => {
-                canvasWidth = parseInt(event.target.value);
-                document.getElementById('canvas-width-value').textContent = canvasWidth;
-                resizeCanvas(canvasWidth, canvasHeight);
-            });
-
-            document.getElementById('canvas-height').addEventListener('input', (event) => {
-                canvasHeight = parseInt(event.target.value);
-                document.getElementById('canvas-height-value').textContent = canvasHeight;
-                resizeCanvas(canvasWidth, canvasHeight);
-            });
-
-            document.getElementById('animation-scale').addEventListener('input', (event) => {
-                animationScale = parseFloat(event.target.value);
-                document.getElementById('animation-scale-value').textContent = animationScale;
             });
         }
 
@@ -268,13 +233,12 @@
                 beginShape();
                 if (R.length < N_of_out) R.push(cpoint);
                 for (let i = 1, n = R.length; i < n; ++i) {
-                    vertex(...R[i].map(v => v * animationScale)); // Scale path points
+                    vertex(...R[i]);
                 }
                 endShape();
                 pop();
 
                 // Draw circles and legs
-                push();
                 translate(width / 2 + xOffset, height / 2 + yOffset);
                 scale(zoomRate);
 
@@ -282,28 +246,29 @@
                 noFill();
                 stroke(document.getElementById('circle-color').value);
                 strokeWeight(1); // Default stroke weight for circles
-                let circleStart = [0, 0];
-                for (let i = 0; i < N_of_circles; ++i) {
-                    const r = hypot(DFT[i]) * animationScale; // Scale radius
-                    ellipse(circleStart[0], circleStart[1], r * 2);
-                    circleStart = add(circleStart, mul(DFT[i], expim(a * K[i])));
+                for (let i = 0, cpoint = [0, 0]; i < N_of_circles; ++i) {
+                    const r = hypot(DFT[i]);
+                    ellipse(cpoint[0], cpoint[1], r * 2);
+                    cpoint = add(cpoint, mul(DFT[i], expim(a * K[i])));
                 }
 
                 // Draw legs (lines connecting circles)
                 stroke(document.getElementById('leg-color').value);
                 strokeWeight(1); // Default stroke weight for legs
-                let prevPoint = [0, 0];
+                let prevP = [0, 0];
                 for (let i = 0; i < N_of_circles; ++i) {
-                    let currentPoint = add(prevPoint, mul(DFT[i], expim(a * K[i])));
-                    line(prevPoint[0], prevPoint[1], currentPoint[0], currentPoint[1]);
-                    prevPoint = currentPoint;
+                    const r = hypot(DFT[i]);
+                    const nextP = add(prevP, mul(DFT[i], expim(a * K[i])));
+                    line(...prevP, ...nextP);
+                    prevP = nextP;
                 }
 
-                // Draw the connecting line from the last circle to the path
+                // Draw the connecting line from circles to path
+                push();
+                translate(width / 4 + xOffset, height / 2 + yOffset);
+                scale(zoomRate);
                 stroke(document.getElementById('line-color').value);
-                strokeWeight(parseInt(document.getElementById('stroke-slider').value)); // Apply stroke weight
-                line(prevPoint[0] + width / 4, prevPoint[1], R[R.length - 1][0] * animationScale + width / 4, R[R.length - 1][1] * animationScale);
-
+                line(prevP[0] + width / 4, prevP[1], R[R.length - 1][0] + width / 4 + xOffset, R[R.length - 1][1] + height / 2 + yOffset);
                 pop();
 
                 t += parseInt(document.getElementById('speed-slider').value);
